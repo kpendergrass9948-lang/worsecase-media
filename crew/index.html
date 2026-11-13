@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Crew Room">
+<title>Crew Room · TikTok CRP</title>
+<style>
+:root{--bg:#0D1117;--panel:#161B22;--line:#2A313C;--ink:#E6EDF3;--muted:#8B949E;--teal:#26B3AE;--red:#EB3831}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{padding:18px 18px 6px;max-width:980px;margin:auto}h1{margin:0;font-size:22px}header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+main{max-width:980px;margin:auto;padding:12px 14px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 10px 12px;text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:border-color .2s,transform .1s}
+.card:active{transform:scale(.98)}.card.lead{grid-column:1/-1;display:flex;gap:16px;align-items:center;text-align:left;padding:14px 18px}
+.face{width:110px;height:110px;margin:auto}.lead .face{width:120px;height:120px;margin:0;flex:none}
+.face svg{width:100%;height:100%}.name{font-weight:700;margin-top:6px;font-size:16px}.role{color:var(--muted);font-size:12px}
+.state{margin-top:6px;font-size:12px;color:var(--muted);min-height:1.4em}
+.card.live{border-color:var(--teal)}.card.live .state{color:var(--teal)}.card.speaking .state{color:#F2C14E}
+.end{display:none;margin:8px auto 0;padding:6px 14px;border-radius:999px;border:1px solid var(--red);background:transparent;color:var(--red);font-weight:600}
+.card.live .end{display:inline-block}
+.face-wrap{position:relative;display:inline-block;border-radius:50%}
+.hub-face{width:100%;height:100%;display:block;overflow:visible}
+.hub-face .head{transform-box:view-box;transform-origin:50px 82px;animation:bob 4.2s ease-in-out infinite;transition:transform .35s}
+.hub-face .eyes{transform-box:fill-box;transform-origin:center;animation:blink 5.2s infinite}
+.hub-face .pupil{transition:transform .3s}
+.hub-face .brows{transition:transform .3s}
+.hub-face .mouth{transition:opacity .08s}
+.hub-face .mouth-open{transform-box:fill-box;transform-origin:center;transform:scaleY(var(--mo,0));opacity:0;transition:transform .07s linear}
+.is-talking .hub-face .mouth-open{opacity:1}
+.is-talking .hub-face .mouth{opacity:0}
+.hub-face .think{opacity:0;transition:opacity .2s}
+.hub-face .think .dot{fill:#E6EDF3;animation:tdot 1s infinite}
+.hub-face .think .dot1{animation-delay:.15s}.hub-face .think .dot2{animation-delay:.3s}
+.is-thinking .hub-face .think{opacity:1}
+.is-thinking .hub-face .pupil{transform:translate(1.4px,-1.8px)}
+.is-listening .hub-face .head{transform:rotate(-5deg) translateY(1px);animation:none}
+.is-listening .hub-face .brows{transform:translateY(-2px)}
+.face-wrap.is-listening::after,.face-wrap.is-talking::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--teal);animation:fpulse 1.2s ease-out infinite;pointer-events:none}
+.face-wrap.is-talking::after{border-color:#F2C14E;animation-duration:.9s}
+.hub-z{font:700 14px system-ui,sans-serif;fill:var(--muted)}
+.is-off .hub-face{filter:saturate(.55) brightness(.8)}
+.hub-face.is-seat circle,.hub-face.is-seat path{opacity:.9}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.4px)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes tdot{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes fpulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.12)}}
+footer{max-width:980px;margin:auto;padding:0 18px 30px;color:var(--muted);font-size:12px}footer a{color:var(--teal)}
+</style></head><body>
+<header><h1>Crew Room</h1><p>Tap a face to talk live. Tap again or End to hang up. Allow the microphone the first time.</p></header>
+<main id="grid"></main>
+<footer>Voices by ElevenLabs. Instructions for the crew still go through Ares in the <a href="https://claude.ai/artifact/4yu6KesTHUN6iGz1r1DqbL">TikTok CRP Hub</a>.</footer>
+<script src="faces.js"></script>
+<script type="module">
+import {Conversation} from "https://cdn.jsdelivr.net/npm/@elevenlabs/client@1/+esm";
+const CREW = [{"id": "ares", "name": "Ares", "role": "Lead assistant", "agent": "agent_4901m7aw9vhyf1v9zw707a2295ey", "look": {"skin": "#8A5A3C", "hair": "#15100C", "hairStyle": "buzz", "shirt": "#0E0F12", "accent": "#C1272D", "eyes": "#2B1A10", "extras": ["headset"]}}, {"id": "jeremy", "name": "Jeremy", "role": "Worst Case Sim", "agent": "agent_7801m7awbn57fpzba5fcwrnsb83k", "look": {"accent": "#EB3831", "extras": [], "hair": "#2A1B12", "hairStyle": "short", "shirt": "#1F8A8A", "skin": "#C99167"}}, {"id": "maya", "name": "Maya", "role": "The Twin Test", "agent": "agent_2001m7awbtsfeak9mekras06qdpv", "look": {"accent": "#F2C14E", "extras": ["glasses"], "hair": "#1A1110", "hairStyle": "ponytail", "shirt": "#3B5BDB", "skin": "#8D5A3B"}}, {"id": "marcus", "name": "Marcus", "role": "The Shift", "agent": "agent_1901m7awc1dqfe38scp83y6skx38", "look": {"accent": "#C5F24E", "extras": ["beard"], "hair": "#1B1210", "hairStyle": "buzz", "shirt": "#E8590C", "skin": "#B57A52", "eyes": "#3A2414"}}, {"id": "rosa", "name": "Rosa", "role": "The Build Bill", "agent": "agent_5401m7awc848edgrr91xbgcxad7z", "look": {"accent": "#F08C00", "extras": ["bandana"], "hair": "#3B2416", "hairStyle": "curly", "shirt": "#2F9E44", "skin": "#D8A27A"}}, {"id": "theo", "name": "Theo", "role": "Inside Job", "agent": "agent_2001m7awcdw9f9zsv3cchh0r9dxv", "look": {"accent": "#22B8CF", "extras": ["goggles"], "hair": "#C8742C", "hairStyle": "swoop", "shirt": "#5F3DC4", "skin": "#F1C9A5"}}];
+const grid = document.getElementById('grid');
+let conv = null, activeId = null;
+const els = {};
+for (const c of CREW) {
+  const card = document.createElement('div'); card.className = 'card' + (c.id === 'ares' ? ' lead' : '');
+  const wrap = document.createElement('div'); wrap.className = 'face face-wrap';
+  wrap.append(window.crewFaces.draw(c.look, 'happy', c.name));
+  const meta = document.createElement('div');
+  meta.innerHTML = '<div class="name"></div><div class="role"></div><div class="state">Tap to talk</div>';
+  meta.querySelector('.name').textContent = c.name; meta.querySelector('.role').textContent = c.role;
+  const end = document.createElement('button'); end.className = 'end'; end.textContent = 'End call';
+  end.addEventListener('click', e => { e.stopPropagation(); hangUp(); });
+  meta.append(end); card.append(wrap, meta); grid.append(card);
+  card.addEventListener('click', () => activeId === c.id ? hangUp() : call(c));
+  els[c.id] = {card, wrap, state: meta.querySelector('.state')};
+}
+setInterval(() => { document.querySelectorAll('.face-wrap.is-talking').forEach(w => w.style.setProperty('--mo', (Math.random() < .16 ? .12 : .35 + Math.random() * .65).toFixed(2))); }, 90);
+function setState(id, text, mode) {
+  const e = els[id]; if (!e) return;
+  e.state.textContent = text;
+  e.card.classList.toggle('live', mode !== 'off'); e.card.classList.toggle('speaking', mode === 'speaking');
+  e.wrap.classList.toggle('is-talking', mode === 'speaking'); e.wrap.classList.toggle('is-listening', mode === 'listening'); e.wrap.classList.toggle('is-thinking', mode === 'connecting');
+}
+async function hangUp() {
+  const id = activeId; activeId = null;
+  if (conv) { const c = conv; conv = null; try { await c.endSession(); } catch (e) {} }
+  if (id) setState(id, 'Tap to talk', 'off');
+}
+async function call(c) {
+  await hangUp();
+  activeId = c.id; setState(c.id, 'Connecting…', 'connecting');
+  try {
+    await navigator.mediaDevices.getUserMedia({audio: true});
+    conv = await Conversation.startSession({
+      agentId: c.agent,
+      onConnect: () => setState(c.id, 'Listening…', 'listening'),
+      onDisconnect: () => { if (activeId === c.id) { activeId = null; conv = null; setState(c.id, 'Tap to talk', 'off'); } },
+      onModeChange: ({mode}) => { if (activeId === c.id) setState(c.id, mode === 'speaking' ? 'Speaking…' : 'Listening…', mode === 'speaking' ? 'speaking' : 'listening'); },
+      onError: () => { if (activeId === c.id) setState(c.id, 'Couldn’t connect. Tap to retry.', 'off'); }
+    });
+  } catch (e) {
+    activeId = null; conv = null;
+    setState(c.id, e && e.name === 'NotAllowedError' ? 'Microphone blocked. Allow it and tap again.' : 'Couldn’t connect. Tap to retry.', 'off');
+  }
+}
+</script></body></html>
